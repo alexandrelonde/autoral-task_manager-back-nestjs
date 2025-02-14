@@ -27,10 +27,18 @@ export class TasksService {
     return task;
   }
 
-  async update(id: number, isCompleted: boolean): Promise<Task> {
-    const task = await this.findOne(id); // findOne lança erro se não encontrar a tarefa
+  async update(id: number, title: string, isCompleted: boolean): Promise<Task> {
+    const task = await this.taskRepository.findOne({ where: { id } });
+
+    if (!task) {
+      throw new Error(`Tarefa com ID ${id} não encontrada`);
+    }
+
+    // Atualiza a tarefa com os novos dados
+    task.title = title;
     task.isCompleted = isCompleted;
-    return this.taskRepository.save(task);
+
+    return await this.taskRepository.save(task);
   }
 
   async remove(id: number): Promise<void> {
